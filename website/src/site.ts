@@ -1,6 +1,6 @@
 // Where the code lives. On GitHub Actions this comes from the repository itself (owner/name);
 // set REPO=owner/name to point the links at a fork.
-const repo = process.env.REPO || process.env.GITHUB_REPOSITORY || "tomgreef/on-the-one";
+const repo = process.env.REPO || process.env.GITHUB_REPOSITORY || "tomgreef/dj-toolkit";
 const url = `https://github.com/${repo}`;
 
 export const links = {
@@ -15,10 +15,11 @@ export const links = {
   suggest: `${url}/issues/new?template=idea.yml`,
   bug: `${url}/issues/new?template=bug_report.yml`,
   ideas: `${url}/issues?q=is%3Aissue+is%3Aopen+label%3Aidea+sort%3Areactions-%2B1-desc`,
+  discussions: `${url}/discussions`,
   licence: `${url}/blob/main/LICENSE`,
 };
 
-/** A path inside the site, correct whether it's served at / or at /on-the-one/ on GitHub Pages. */
+/** A path inside the site, correct whether it's served at / or at /dj-toolkit/ on GitHub Pages. */
 export function asset(path: string): string {
   const base = import.meta.env.BASE_URL.endsWith("/") ? import.meta.env.BASE_URL : `${import.meta.env.BASE_URL}/`;
   return `${base}${path.replace(/^\//, "")}`;

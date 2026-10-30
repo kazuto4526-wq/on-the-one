@@ -10,13 +10,14 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QColor
+from PySide6.QtCore import Qt, QUrl, Signal
+from PySide6.QtGui import QColor, QDesktopServices
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QDoubleSpinBox,
     QHBoxLayout,
     QHeaderView,
+    QInputDialog,
     QLabel,
     QLineEdit,
     QMenu,
@@ -174,6 +175,7 @@ class SyncTab(QWidget):
         menu = QMenu(self.more_btn)
         menu.addAction("Import the old tool's .env…", self._import_env)
         menu.addAction("Import the old tool's searches…", self._import_cache)
+        menu.addAction("Callback port…", self._set_callback_port)
         self.report_action = menu.addAction("Open the unmatched report", self._open_report)
         self.report_action.setEnabled(False)
         self.more_btn.setMenu(menu)
@@ -339,9 +341,22 @@ class SyncTab(QWidget):
             self, "Searches imported", f"Added {n} remembered search(es). Those tracks won't need searching again."
         )
 
+    def _set_callback_port(self) -> None:
+        port, ok = QInputDialog.getInt(
+            self,
+            "Callback port",
+            "Spotify uses this port to link to DJ Toolkit. If another app uses it, change it here, then update the Redirect URI in your Spotify app to match.",
+            self.s.callback_port,
+            1024,
+            65535,
+        )
+        if ok:
+            self.s.callback_port = port
+            self._invalidate()
+
     def _open_report(self) -> None:
         if self.summary and self.summary.report_path:
-            os.startfile(self.summary.report_path)  # noqa: S606 - Windows only, user-initiated
+            QDesktopServices.openUrl(QUrl.fromLocalFile(str(self.summary.report_path)))
 
     def _confirm_sync(self) -> bool:
         box = QMessageBox(

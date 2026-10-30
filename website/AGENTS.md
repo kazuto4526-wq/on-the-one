@@ -7,7 +7,7 @@ The landing page for DJ Toolkit: one static page built with Astro, published to 
 
 | To | Run |
 |---|---|
-| Install once | `npm ci` |
+| Install once | `npm ci --ignore-scripts` (a package can hide code in an install script, and the build needs none) |
 | Work on it | `npm run dev`, then open http://localhost:4321 |
 | Check it builds | `npm run build` (CI runs this on every pull request) |
 | See the production build | `npm run build` then `npm run preview` |
@@ -25,7 +25,7 @@ The landing page for DJ Toolkit: one static page built with Astro, published to 
 - `src/site.ts` also reads two things from GitHub when the site is built: the most-voted ideas (issues labelled
   `idea`) and the latest release's downloads. Both fall back quietly when GitHub can't be reached, and the download
   buttons only appear once a release has both files. The Pages workflow rebuilds the site daily to refresh votes.
-- Links to GitHub come from `src/site.ts`. On GitHub Actions they use the repository the site is built from; elsewhere `tomgreef/on-the-one`.
+- Links to GitHub come from `src/site.ts`. On GitHub Actions they use the repository the site is built from; elsewhere `tomgreef/dj-toolkit`.
 
 ## Rules
 

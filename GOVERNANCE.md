@@ -10,6 +10,7 @@ How decisions get made, who can approve what, and how you grow from a first pull
 | **Collaborator** | Invited after a few merged pull requests | Push branches here (no fork needed), label and assign issues, re-run CI, review. A code owner still approves |
 | **Maintainer** | A collaborator listed in [`.github/CODEOWNERS`](.github/CODEOWNERS), for one area or for all of it | Approve and merge pull requests in their area, triage, shape the roadmap |
 | **Owner** | [@tomgreef](https://github.com/tomgreef) | Settings, releases, roles and the final say |
+| **Maintainer's agent** | An AI agent on its own GitHub account, run by the owner ([docs/maintaining.md](docs/maintaining.md#the-maintainer-agent)) | Answer, triage and audit, and suggest changes. It has no role here, so it can't push, approve or merge |
 
 Every change reaches `main` through a pull request, and nothing merges while CI is red, whoever wrote it.
 A pull request also needs an approval from a code owner of each file it changes. Today the owner is the only code
@@ -34,7 +35,7 @@ past maintainers. You're welcome back any time.
 
 - **Small things** are decided in the pull request, by the maintainer who reviews it.
 - **What gets built next:** the votes on
-  [ideas](https://github.com/tomgreef/on-the-one/issues?q=is%3Aissue+is%3Aopen+label%3Aidea+sort%3Areactions-%2B1-desc)
+  [ideas](https://github.com/tomgreef/dj-toolkit/issues?q=is%3Aissue+is%3Aopen+label%3Aidea+sort%3Areactions-%2B1-desc)
   guide it. The maintainers decide and say why in the issue.
 - **Rules and big changes** (a new dependency, the persona, the voice, these roles) start as an issue. If no
   maintainer objects within a week, they go ahead. When people disagree, the owner decides and records it in

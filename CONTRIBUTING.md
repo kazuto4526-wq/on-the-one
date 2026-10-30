@@ -5,9 +5,11 @@ Thanks for helping. DJ Toolkit is small, so a good change is small too.
 ## Ways to help
 
 - **Vote on what comes next.** Every idea is an issue labelled
-  [`idea`](https://github.com/tomgreef/on-the-one/issues?q=is%3Aissue+is%3Aopen+label%3Aidea+sort%3Areactions-%2B1-desc),
+  [`idea`](https://github.com/tomgreef/dj-toolkit/issues?q=is%3Aissue+is%3Aopen+label%3Aidea+sort%3Areactions-%2B1-desc),
   and a thumbs-up reaction is a vote (please don't comment "+1"). The website and the app's Requests page list the
   most-voted ones. You can suggest an idea or report a bug from either, too.
+- **Ask a question, or talk DJ.** [Discussions](https://github.com/tomgreef/dj-toolkit/discussions) has Q&A,
+  *Show and tell* for your sets and workflow, and *DJ talk*. An issue is for something to do; a question goes there.
 - **DJ feedback, no code needed.** Try it on a real acapella or your own folders, and tell us what felt off.
   Open an issue and pick *DJ feedback*.
 - **Argue with the drafts.** The tutorials and the persona ([docs/ux/PERSONA.md](docs/ux/PERSONA.md)) are guesses
@@ -17,8 +19,9 @@ Thanks for helping. DJ Toolkit is small, so a good change is small too.
 
 ## From issue to merged pull request
 
-1. **Start with an issue.** Pick a form at [New issue](https://github.com/tomgreef/on-the-one/issues/new/choose):
-   bug, idea, DJ feedback, or a change to the code, tests or docs. A typo fix can skip this step.
+1. **Start with an issue.** Pick a form at [New issue](https://github.com/tomgreef/dj-toolkit/issues/new/choose):
+   bug, idea, DJ feedback, or a change to the code, tests or docs. A typo fix in the docs can skip this step; a pull
+   request from outside that names no issue and changes more than the docs gets a comment asking which issue it is for.
 2. **Triage.** A maintainer reads each new issue (label `needs triage`) within about a week, then labels it, asks a
    question, or closes it with a reason. Issues open to anyone get `help wanted` or `good first issue`.
 3. **Claim it.** Comment that you'd like to take it and a maintainer assigns you. Nothing to show after two weeks?
@@ -37,8 +40,8 @@ Thanks for helping. DJ Toolkit is small, so a good change is small too.
 ## Set up (Windows, about five minutes)
 
 ```bat
-git clone https://github.com/<you>/on-the-one.git
-cd on-the-one
+git clone https://github.com/<you>/dj-toolkit.git
+cd dj-toolkit
 py -3.12 -m venv .venv
 .venv\Scripts\pip install -r requirements-dev.txt
 .venv\Scripts\pre-commit install
@@ -59,7 +62,12 @@ On macOS, use `.venv/bin/python tools/check.py`. More detail, and fixes for comm
   what the agent did. [docs/vibe-coding.md](docs/vibe-coding.md) has the workflow that works here.
 - A title that's plain and imperative, under 72 characters, like `Snap the start marker to the grid`. It becomes
   the commit message.
-- A first-time contributor's CI waits until a maintainer starts it. That's GitHub's safety default, not a judgement.
+- Every outside pull request waits for a maintainer to read it and start its CI, after each push. That's how we keep
+  everyone's code and downloads safe, not a judgement of you. It's why a pull request that changes one thing is
+  merged faster than one that changes five, and why a new dependency needs its own issue first.
+- The first answer often comes from the **maintainer's agent**, an AI on its own account that reads every pull request
+  line by line. Instead of a list of things to fix, it may leave suggested changes: press **Commit suggestion** on
+  each one you agree with, or reply on it. Its comments say they're its own. The owner approves and merges.
 
 ## Grow with the project
 

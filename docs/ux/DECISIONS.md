@@ -6,6 +6,102 @@ Format: what was asked → what we did → why → what is still open.
 
 ---
 
+## 2026-10-29: A maintainer's agent that answers, triages and suggests, but can't merge
+
+**Owner request.** The repository is getting traction: a routine and a skill that answer people, collaborate on their
+pull requests ("instead of telling them what to do, we create a pull request that merges into theirs, with an
+explanation"), analyse them, and know the rules, so that no security breach happens. The owner chose: a separate bot
+account; on its own it may reply and triage, and collaborate on pull requests; it doesn't start CI and doesn't merge
+(both stay the owner's click). It runs every four hours from 08:00, Madrid time.
+
+**What we did.** The `maintain` skill (`.claude/skills/maintain/`), the tool it writes through (`tools/maintainer.py`,
+pinned by `tests/test_maintainer.py`), and a routine at 08:00, 12:00, 16:00 and 20:00 that looks back 12 hours at 08:00
+and 4 hours otherwise, with a safety net for anything nobody ever answered. Setup and the reasons are in
+`docs/maintaining.md`, "The maintainer agent".
+
+**Why it's built this way.** We read Anthropic's cloud docs first, and they changed the plan three times:
+
+- A cloud run acts on GitHub as whichever account is connected to claude.ai, through git and the built-in GitHub tools,
+  even with a bot token in `GH_TOKEN`. So the bot's account is what gets connected, and the tool refuses to write
+  whenever any route on the machine still reaches the owner.
+- The cloud's GitHub proxy serves only the repositories attached to the run, and a run with two repositories drops
+  the shared permission rules. So an unattended run can't open a pull request in a contributor's fork. It makes its
+  fixes as suggested changes on their pull request instead: one click each (**Commit suggestion**), and the change
+  lands in their branch. A full pull request into their branch stays possible with the owner, from the owner's machine.
+- On a personal account's repository GitHub has no Triage role, and any collaborator can push, run workflows and
+  replace release downloads. So the bot is not a collaborator: anyone may comment and suggest on a public repository,
+  and the labels, assignments and review requests it decides on go to the owner as one-line items in its digest.
+
+**Still open.** Moving the repository to an organization (GOVERNANCE.md) would let the bot have Triage and do those
+itself. The owner creates the bot account and connects it (the setup steps), then turns the routine on; the first run
+shows whether the identity check passes. On 2026-10-29 an earlier session ran #42's tests on the owner's machine
+while collaborating on it; the skill now forbids running a contributor's code anywhere but CI.
+
+---
+
+## 2026-10-29: Dependency files keep Dependabot's auto-merge, with a guard
+
+**Owner request.** Close the gap that left `requirements*.txt` and `website/package*.json` without a code owner (#59),
+but keep Dependabot's minor and patch updates merging themselves.
+
+**What we did.** A workflow that runs from `main` posts a status, **Dependency files**, on every pull request. It
+fails when anyone but Dependabot or the owner changed one of those files. It becomes a required check in the ruleset
+only after it has run on a real pull request (`docs/maintaining.md`).
+
+**Why this and not an owner for those files.** An owner would also have to approve Dependabot's pull requests, which
+ends the auto-merge. A check written as part of a pull request can be edited by that pull request, so the guard uses
+`pull_request_target`, never checks out the pull request, and reports through the commit status API. The cost is that
+it can't be tested before it merges, and that it needs one ruleset change afterwards.
+
+**Still open.** Dependabot's own pull requests are trusted as they are: a hijacked release is caught by the seven-day
+cooldown and by CI, not by this guard.
+
+---
+
+## 2026-10-29: Every outside and AI-written change waits for the owner
+
+**Owner request.** After a new account sent its first pull request: people, and the AI agents they use, might try to
+sneak in something harmful, such as a dependency that steals data. Make rules so every change is inspected and the
+owner controls all the work agents provide.
+
+**What we did.** `AGENTS.md` says what an agent does with a pull request it didn't write: audit it, report, never
+approve, merge or start CI, and never run it on a machine that holds credentials. `docs/maintaining.md` has the
+checklist (one issue, the author, the files, every line, accidental edits, dependencies, where to run it, report then
+approve). GitHub now holds the workflow runs of every outside contributor, not just first-timers (*Settings >
+Actions > General*). Copilot's monthly major updates no longer turn on auto-merge: the owner reads and merges them.
+`test_repo_rules.py` fails if any workflow other than Dependabot's minor and patch flow approves or merges a pull request.
+
+**Why.** Copilot reads migration guides from the web, which an attacker can write, and the old flow merged what it
+produced once CI was green, with the owner's token and no review. CI can't tell a harmless dependency from a harmful
+one: `Dependency review` only knows about published vulnerabilities.
+
+**Still open.** Dependabot's minor and patch updates still merge themselves once CI is green, after a seven-day
+cooldown: the owner's call. The dependency files have no code owner, so a future second maintainer could approve a
+change to them alone (#59). Python dependencies are pinned by version, not by hash (#60). A new dependency isn't yet
+forced to come with a written reason (#61), and the website's install scripts still run (#62).
+
+---
+
+## 2026-10-29: The repository is called dj-toolkit
+
+**Owner request.** The repository was `on-the-one` but everything a user sees says "DJ Toolkit". Rename the repository
+to `dj-toolkit`, and change the code so everything keeps working.
+
+**What we did.** The owner renamed the repository on GitHub. This change updates every mention of the old name: the
+docs, the issue forms, the website's fallback links, the two workflows that only run on this repository, and the
+repository name the app searches for ideas (`djtoolkit/feedback.py`). The product name, the Python package
+(`djtoolkit`) and the data folder (`DJToolkit`) stay as they are.
+
+**Why it needed care.** GitHub redirects the old repository, issue, clone and release-download links, but not two
+things. GitHub Pages: the site must be deployed again under `tomgreef.github.io/dj-toolkit/`, and the old address
+stops working. GitHub's search API: it answers 422 to `repo:tomgreef/on-the-one`, so the Requests page in version
+0.1.0 can't load ideas. Only a new release fixes that.
+
+**Open.** Publish the next release soon, for the Requests page. "On the one" is still the tagline and the idea behind
+the project; only the repository's name changed.
+
+---
+
 ## 2026-10-28: Who approves what, roles, Dependabot and security
 
 **Owner request.** "I need to approve all PRs, otherwise this might go crazy", while letting developers grow from
@@ -122,9 +218,9 @@ trackers, no web fonts, no third-party requests; Astro's telemetry is switched o
 1440, 768 and 390 px in both looks; two class-name collisions between page and component styles were found that way
 and fixed (page classes now have page-only names).
 
-**Published** the same day at [github.com/tomgreef/on-the-one](https://github.com/tomgreef/on-the-one), with
+**Published** the same day at [github.com/tomgreef/dj-toolkit](https://github.com/tomgreef/dj-toolkit), with
 GitHub Pages (built by Actions) and private vulnerability reporting turned on. The site:
-[tomgreef.github.io/on-the-one](https://tomgreef.github.io/on-the-one/).
+[tomgreef.github.io/dj-toolkit](https://tomgreef.github.io/dj-toolkit/).
 
 **Open.** The owner has seen the website in the preview but hasn't given a verdict yet.
 

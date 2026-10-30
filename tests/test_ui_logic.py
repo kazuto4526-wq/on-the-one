@@ -1,6 +1,7 @@
 """Theme, icons, Spotify sync gating, tutorials and dialogs."""
 
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 
@@ -60,6 +61,27 @@ def test_incomplete_matching_does_not_unlock_sync(app):
     t = SyncTab(Settings())
     t._finished(engine.SyncSummary(tracks=10, matched=4, deferred=6, incomplete=True), dry_run=True)
     assert not t.sync_btn.isEnabled()
+
+
+def test_the_unmatched_report_opens_in_the_system_viewer(app, tmp_path, monkeypatch):
+    """`os.startfile` exists only on Windows, so the report has to open the way every system opens a file."""
+    from PySide6.QtGui import QDesktopServices
+
+    from djtoolkit.settings import Settings
+    from djtoolkit.spotify import engine
+    from djtoolkit.ui.sync_tab import SyncTab
+
+    opened = []
+    monkeypatch.setattr(QDesktopServices, "openUrl", lambda url: opened.append(url.toLocalFile()) or True)
+    report = tmp_path / "unmatched.csv"
+    report.write_text("genre,artist\n", "utf8")
+
+    t = SyncTab(Settings())
+    t._open_report()  # nothing synced yet: nothing to open
+    assert opened == []
+    t.summary = engine.SyncSummary(report_path=report)
+    t._open_report()
+    assert [Path(p) for p in opened] == [report]
 
 
 # ---------------------------------------------------------------- dialogs
@@ -276,4 +298,61 @@ def test_floating_panels_paint_a_card_with_a_shadow_below_it(app):
         )  # the card
         edge = img.pixelColor(img.width() // 2, img.height() - b - 3 + 6)  # just under the card's bottom edge
         assert edge.alpha() > 0  # the soft shadow is painted there, not left empty
+    theme.apply(app, "dark", theme.DEFAULT_ACCENT)
+
+
+def test_callback_port_updates_on_ok(app):
+    from djtoolkit.settings import Settings
+    from djtoolkit.ui.sync_tab import SyncTab
+
+    t = SyncTab(Settings())
+    assert t.s.callback_port == 8888
+
+    with patch("djtoolkit.ui.sync_tab.QInputDialog.getInt", return_value=(9999, True)):
+        t._set_callback_port()
+        assert t.s.callback_port == 9999
+
+
+def test_callback_port_unchanged_on_cancel(app):
+    from djtoolkit.settings import Settings
+    from djtoolkit.ui.sync_tab import SyncTab
+
+    t = SyncTab(Settings())
+
+    with patch("djtoolkit.ui.sync_tab.QInputDialog.getInt", return_value=(8888, False)):
+        t._set_callback_port()
+        assert t.s.callback_port == 8888
+
+
+def test_menu_has_opaque_background(app):
+    from PySide6.QtWidgets import QMenu
+
+    from djtoolkit.ui import theme
+
+    menu = QMenu()
+
+    for mode in ("dark", "light"):
+        theme.apply(app, mode)
+        bg_color = menu.palette().window().color()
+        assert bg_color.alpha() == 255
+
+
+def test_a_disabled_menu_entry_looks_disabled(app):
+    from PySide6.QtGui import QColor
+    from PySide6.QtWidgets import QMenu
+
+    def ink(img, rect, bg):  # how far a row's pixels sit from the background: its text
+        pixels = (
+            img.pixelColor(x, y) for x in range(rect.left(), rect.right()) for y in range(rect.top(), rect.bottom())
+        )
+        return sum(abs(p.red() - bg.red()) + abs(p.green() - bg.green()) + abs(p.blue() - bg.blue()) for p in pixels)
+
+    for mode in ("dark", "light"):
+        theme.apply(app, mode)
+        menu = QMenu()
+        on, off = menu.addAction("Same words"), menu.addAction("Same words")
+        off.setEnabled(False)
+        img, bg = menu.grab().toImage(), QColor(theme.P.panel)
+        loud, quiet = ink(img, menu.actionGeometry(on), bg), ink(img, menu.actionGeometry(off), bg)
+        assert loud > quiet > 0  # the disabled entry is quieter than the others, and still legible
     theme.apply(app, "dark", theme.DEFAULT_ACCENT)

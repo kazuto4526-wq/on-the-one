@@ -5,6 +5,34 @@ and versions follow [Semantic Versioning](https://semver.org/). Each release's s
 
 ## [Unreleased]
 
+### Added
+
+- You can change the Spotify callback port (Spotify sync, More, Callback port) if something else uses 8888.
+- You can now check a download. GitHub keeps a signed record of where each file was built, and the release has a
+  `SHA256SUMS.txt` to check it arrived whole. How:
+  [Check a download](https://github.com/tomgreef/dj-toolkit/blob/main/docs/releasing.md#check-a-download).
+- Each release now has a list of the libraries inside the app, one for Windows and one for Mac (a software bill of
+  materials), so a company or a security scanner can see what the download is made of. It says what it leaves out in
+  [Check a download](https://github.com/tomgreef/dj-toolkit/blob/main/docs/releasing.md#check-a-download).
+
+### Fixed
+
+- The **More** menu on the Spotify page is readable in the Daylight theme: its background and text follow the theme, and
+  the entry that is switched off looks switched off.
+
+## [0.1.1] - 2026-10-29
+
+### Changed
+
+- The repository is now `tomgreef/dj-toolkit`, to match the name of the app, and the website moved to
+  `tomgreef.github.io/dj-toolkit/`. Old repository links redirect; the old website address doesn't.
+
+### Fixed
+
+- The Requests page loads the most-voted ideas again. Version 0.1.0 looked them up under the repository's old name and
+  can't find them, so update to this version.
+- On macOS, Open the unmatched report (Spotify sync, More) now opens the report. It only worked on Windows.
+
 ## [0.1.0] - 2026-10-28
 
 ### Added
